@@ -2,7 +2,7 @@ import React from "react";
 import {useState, useReducer} from "react";
 import useLocalStorage from "./hooks/useLocalStorage";
 import Card from "./Card"
-
+import Counter from "./Counter";
 
 const App = () => {
     const [expenseAmount, setExpenseAmount] = useState("");
@@ -44,6 +44,8 @@ const App = () => {
                 )}
                 
             <h2>total: {totalExpenses}</h2>
+
+            <Counter/>
 
         </form>
     );
