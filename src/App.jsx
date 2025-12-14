@@ -82,8 +82,12 @@ const App = () => {
                 <button type="submit">submit</button>
 
                 {expense.expenseList.map((li, index) => 
-                    <Card className="card" key={index} title={li.item}>
-                        <p>${li.amount}</p>
+                    <Card 
+                        className="card" 
+                        key={index} 
+                        title={li.item}
+                        amount={li.amount}> {/**passing amount as prop instead of children so as to avoid re-rendering issue*/}
+                            {/* <p>${li.amount}</p> */}
                     </Card>
                 )}
                 

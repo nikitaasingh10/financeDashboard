@@ -1,12 +1,20 @@
 import React from "react";
 
-const Card = ({title, children, style, className}) => {
+const Card = ({title, amount, style, className}) => {
+    console.log(`🔄 Card "${title}" is rendering`);
     return (
         <div className={className} style={style}>
-            <h2>{title}</h2>
-            {children}
+            <h3>{title}</h3>
+            <h3>${amount}</h3>
         </div>
     );
 };
 
-export default Card;
+export default React.memo(Card);
+
+/*
+React.memo does:
+    Only re-renders Card if props actually change
+    Compares prev props vs new props
+    Skips render if props are the same
+*/
