@@ -1,5 +1,5 @@
 import React from "react";
-import {useState, useReducer} from "react";
+import {useState, useReducer, useEffect} from "react";
 import useLocalStorage from "./hooks/useLocalStorage";
 import Card from "./Card"
 import Counter from "./Counter";
@@ -21,6 +21,8 @@ const expenseReducer = (state, action) => {
                 expenseAmount: "",
                 expenseDescription: ""
             }
+        case 'LOAD_Expense':
+            return {...state, expenseList: action.payload};
         default:
             return state;
     }
@@ -36,6 +38,20 @@ const App = () => {
     const totalExpenses = expense.expenseList.reduce((total, item) => {
         return total += item.amount;
     }, 0);
+
+    useEffect(() => {
+        const savedExpenses = localStorage.getItem('expenses');
+        if (savedExpenses) {
+            dispatch({
+                type: 'LOAD_Expense',
+                payload: JSON.parse(savedExpenses)
+            })
+        }
+    }, []);
+
+    useEffect(() => {
+        localStorage.setItem('expenses', JSON.stringify(expense.expenseList));
+    }, [expense.expenseList]);
 
     return (
         <form onSubmit={(e) => {
