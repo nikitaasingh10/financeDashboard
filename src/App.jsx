@@ -1,5 +1,5 @@
 import React from "react";
-import {useState, useReducer, useEffect} from "react";
+import {useState, useReducer, useEffect, useMemo} from "react";
 import useLocalStorage from "./hooks/useLocalStorage";
 import Card from "./Card"
 import Counter from "./Counter";
@@ -35,9 +35,12 @@ const App = () => {
         expenseList: []
     });
 
-    const totalExpenses = expense.expenseList.reduce((total, item) => {
-        return total += item.amount;
-    }, 0);
+    const totalExpenses = useMemo(() => {
+        return expense.expenseList.reduce((total, item) => {
+            return total + item.amount;
+        }, 0)
+    }, [expense.expenseList]); // only recalculate when expenseList changes
+
 
     useEffect(() => {
         const savedExpenses = localStorage.getItem('expenses');
