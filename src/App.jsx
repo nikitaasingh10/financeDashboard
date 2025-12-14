@@ -4,40 +4,64 @@ import useLocalStorage from "./hooks/useLocalStorage";
 import Card from "./Card"
 import Counter from "./Counter";
 
-const App = () => {
-    const [expenseAmount, setExpenseAmount] = useState("");
-    const [expenseDescription, setExpenseDescription] = useState("");
-
-    // using custom hook useLocalStorage instead of useState
-    // const [expenseList, setExpenseList] = useState([]);
-    const [expenseList, setExpenseList] = useLocalStorage('expenses', []);
-
-    const totalExpenses = expenseList.reduce((total, expense) => total + expense.amount, 0);
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        const expenseObj = {item: expenseDescription, amount: Number.parseInt(expenseAmount)};
-        setExpenseList([...expenseList, expenseObj]);
-        setExpenseAmount("");
-        setExpenseDescription("");
+const expenseReducer = (state, action) => {
+    switch (action.type) {
+        case 'ADD_ExpenseAmount':
+            return {...state, expenseAmount: action.payload};
+        case 'ADD_ExpenseDescription':
+            return {...state, expenseDescription: action.payload};
+        case 'SUBMIT_Expense':
+            const newExpenseObj = {
+                item: state.expenseDescription,
+                amount: Number.parseInt(state.expenseAmount)
+            };
+            return {
+                ...state,
+                expenseList: [...state.expenseList, newExpenseObj],
+                expenseAmount: "",
+                expenseDescription: ""
+            }
+        default:
+            return state;
     }
+};
+
+const App = () => {
+    const [expense, dispatch] = useReducer(expenseReducer, {
+        expenseAmount: "",
+        expenseDescription: "",
+        expenseList: []
+    });
+
+    const totalExpenses = expense.expenseList.reduce((total, item) => {
+        return total += item.amount;
+    }, 0);
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={(e) => {
+            e.preventDefault();
+            dispatch({type: 'SUBMIT_Expense'})
+        }}>
             
                 <input 
-                    value={expenseDescription}
+                    value={expense.expenseDescription}
                     placeholder="Enter expense description"
-                    onChange={(e) => setExpenseDescription(e.target.value)}
+                    onChange={(e) => dispatch({
+                        type: 'ADD_ExpenseDescription',
+                        payload: e.target.value
+                    })}
                 />
                 <input
                     placeholder="Enter expense amount"
-                    value={expenseAmount}
-                    onChange={(e) => setExpenseAmount(Number.parseInt(e.target.value))}
+                    value={expense.expenseAmount}
+                    onChange={(e) => dispatch({
+                        type: 'ADD_ExpenseAmount',
+                        payload: Number.parseInt(e.target.value)
+                    })}
                 />
                 <button type="submit">submit</button>
 
-                {expenseList.map((li, index) => 
+                {expense.expenseList.map((li, index) => 
                     <Card className="card" key={index} title={li.item}>
                         <p>${li.amount}</p>
                     </Card>
