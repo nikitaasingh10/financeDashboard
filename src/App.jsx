@@ -1,5 +1,5 @@
 import React from "react";
-import {useState, useReducer, useEffect, useMemo} from "react";
+import {useState, useReducer, useEffect, useMemo, useCallback} from "react";
 import useLocalStorage from "./hooks/useLocalStorage";
 import Card from "./Card"
 import Counter from "./Counter";
@@ -41,7 +41,6 @@ const App = () => {
         }, 0)
     }, [expense.expenseList]); // only recalculate when expenseList changes
 
-
     useEffect(() => {
         const savedExpenses = localStorage.getItem('expenses');
         if (savedExpenses) {
@@ -56,11 +55,13 @@ const App = () => {
         localStorage.setItem('expenses', JSON.stringify(expense.expenseList));
     }, [expense.expenseList]);
 
+    const handleSubmit = useCallback((e) => {
+        e.preventDefault();
+        dispatch({type: 'SUBMIT_Expense'});
+    }, []); // No dependencies = function never changes
+
     return (
-        <form onSubmit={(e) => {
-            e.preventDefault();
-            dispatch({type: 'SUBMIT_Expense'})
-        }}>
+        <form onSubmit={handleSubmit}>
             
                 <input 
                     value={expense.expenseDescription}
