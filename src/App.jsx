@@ -3,6 +3,8 @@ import {useState, useReducer, useEffect, useMemo, useCallback} from "react";
 import useLocalStorage from "./hooks/useLocalStorage";
 import Card from "./Card"
 import Counter from "./Counter";
+import {ErrorBoundary} from "./ErrorBoundary"
+import CrashTest from "./CrashTest";
 
 const expenseReducer = (state, action) => {
     switch (action.type) {
@@ -61,41 +63,50 @@ const App = () => {
     }, []); // No dependencies = function never changes
 
     return (
-        <form onSubmit={handleSubmit}>
-            
-                <input 
-                    value={expense.expenseDescription}
-                    placeholder="Enter expense description"
-                    onChange={(e) => dispatch({
-                        type: 'ADD_ExpenseDescription',
-                        payload: e.target.value
-                    })}
-                />
-                <input
-                    placeholder="Enter expense amount"
-                    value={expense.expenseAmount}
-                    onChange={(e) => dispatch({
-                        type: 'ADD_ExpenseAmount',
-                        payload: Number.parseInt(e.target.value)
-                    })}
-                />
-                <button type="submit">submit</button>
-
-                {expense.expenseList.map((li, index) => 
-                    <Card 
-                        className="card" 
-                        key={index} 
-                        title={li.item}
-                        amount={li.amount}> {/**passing amount as prop instead of children so as to avoid re-rendering issue*/}
-                            {/* <p>${li.amount}</p> */}
-                    </Card>
-                )}
+        <ErrorBoundary>
+            <CrashTest/>
+            <form onSubmit={handleSubmit}>
                 
-            <h2>total: {totalExpenses}</h2>
+                    <input 
+                        value={expense.expenseDescription}
+                        placeholder="Enter expense description"
+                        onChange={(e) => dispatch({
+                            type: 'ADD_ExpenseDescription',
+                            payload: e.target.value
+                        })}
+                    />
+                    <input
+                        placeholder="Enter expense amount"
+                        value={expense.expenseAmount}
+                        onChange={(e) => dispatch({
+                            type: 'ADD_ExpenseAmount',
+                            payload: Number.parseInt(e.target.value)
+                        })}
+                    />
+                    <button type="submit">submit</button>
 
-            <Counter/>
+                    {expense.expenseList.map((li, index) => 
+                        <Card 
+                            className="card" 
+                            key={index} 
+                            title={li.item}
+                            amount={li.amount}> {/**passing amount as prop instead of children so as to avoid re-rendering issue*/}
+                                {/* <p>${li.amount}</p> */}
+                        </Card>
+                    )}
+                    
+                <h2>total: {totalExpenses}</h2>
 
-        </form>
+                <Counter/>
+
+            </form>
+
+            {/* 
+            // TODO: it doesn't works why?
+            <button type="button" onClick={() => {throw new Error('Test crash')}}>
+                crash test
+            </button> */}
+        </ErrorBoundary>
     );
 };
 
